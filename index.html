@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated 3d Favicon</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+	<script>
+// Create an off-screen canvas
+const canvas = document.createElement('canvas');
+canvas.width = 64; // Higher resolution for better icon quality
+canvas.height = 64;
+// document.body.appendChild(canvas); // Optional, for debugging
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(64, 64);
+
+// Create a basic scene with a rotating wireframe cube
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+camera.position.z = 5;
+
+const geometry = new THREE.BoxGeometry(2, 2, 2);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+let colorShift = 0;
+
+function animate() {
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+
+    // Cycle the hue between 0 and 360 degrees
+    colorShift = (colorShift + 1) % 360; // Increment and wrap around at 360
+    const color = new THREE.Color(`hsl(${colorShift}, 100%, 50%)`); // Use HSL for smooth transitions
+    cube.material.color.set(color);
+
+    renderer.render(scene, camera);
+
+    // Convert the rendered canvas to a data URL and update the favicon
+    const faviconUrl = canvas.toDataURL('image/png');
+    updateFavicon(faviconUrl);
+
+    requestAnimationFrame(animate);
+}
+
+function updateFavicon(url) {
+    let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'icon';
+    link.href = url;
+    document.getElementsByTagName('head')[0].appendChild(link);
+}
+
+// Start the animation loop
+animate();
+
+</script>
+</body>
+</html>
